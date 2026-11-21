@@ -6,8 +6,9 @@ Simple auth app. TypeScript, React, Express.
 
 ```
 auth/
-├── client/   # Vite + React + TS (:5173)
-└── server/   # Express + TS (:3000)
+└── apps/
+    ├── client/   # Vite + React + TS (:5173)
+    └── server/   # Express + TS (:3000)
 ```
 
 ## Setup
