@@ -1,4 +1,6 @@
-export type User = { email: string };
+export interface User {
+  email: string;
+}
 
 async function request<T>(
   method: string,
