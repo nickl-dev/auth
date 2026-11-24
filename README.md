@@ -1,20 +1,38 @@
 # auth
 
-Simple auth app. TypeScript, React, Express.
+Simple auth app. Register, log in, log out.
+
+## Stack
+
+- **Client:** React, TypeScript, Vite, Tailwind, shadcn/ui, Redux Toolkit
+- **Server:** Express, TypeScript, Drizzle ORM
+- **Database:** Postgres (Supabase)
 
 ## Structure
 
 ```
 auth/
-└── apps/
-    ├── client/   # Vite + React + TS (:5173)
-    └── server/   # Express + TS (:3000)
+├── apps/
+    ├── client/   # Vite + React (:5173)
+    └── server/   # Express (:3000)
 ```
 
 ## Setup
 
 ```bash
 npm install
+```
+
+Create `apps/server/.env`:
+
+```
+DATABASE_URL=postgresql://postgres.[PROJECT-REF]:[PASSWORD]@[POOLER-HOST]:5432/postgres
+```
+
+Create the database table:
+
+```bash
+npm run db:push -w apps/server
 ```
 
 ## Run
@@ -26,11 +44,22 @@ npm run dev
 - Client: http://localhost:5173
 - Server: http://localhost:3000
 
-The client proxies `/api` to the server.
+The client proxies `/api` to the server in development.
+
+## API
+
+| Method | Route                | Description         |
+| ------ | -------------------- | ------------------- |
+| POST   | `/api/auth/register` | Create account      |
+| POST   | `/api/auth/login`    | Log in              |
+| POST   | `/api/auth/logout`   | Log out             |
+| GET    | `/api/auth/me`       | Current user        |
+| GET    | `/api/health`        | Server health check |
 
 ## Scripts
 
-| Command         | Description             |
-| --------------- | ----------------------- |
-| `npm run dev`   | Run client and server   |
-| `npm run build` | Build server and client |
+| Command                          | Description                 |
+| -------------------------------- | --------------------------- |
+| `npm run dev`                    | Run client and server       |
+| `npm run build`                  | Build client and server     |
+| `npm run db:push -w apps/server` | Sync schema to the database |
