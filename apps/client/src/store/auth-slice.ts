@@ -34,7 +34,9 @@ const slice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    clearError: (state) => (state.error = "")
+    clearError: (state) => {
+      state.error = "";
+    }
   },
   extraReducers: (builders) => {
     builders.addCase(fetchMe.fulfilled, (state, action) => {

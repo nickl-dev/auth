@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
+import { Spinner } from "./ui/spinner";
 import {
   Card,
   CardContent,
@@ -10,40 +11,29 @@ import {
   CardHeader,
   CardTitle
 } from "./ui/card";
-import { api, type User } from "../lib/api";
 import { PasswordRequirements, isValidPassword } from "./password-requirements";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { register, login, clearError } from "../store/auth-slice";
 
-export function AuthForm({ onSuccess }: { onSuccess: (user: User) => void }) {
+export function AuthForm() {
+  const dispatch = useAppDispatch();
   const [mode, setMode] = useState<"login" | "register">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const { loading, error } = useAppSelector((state) => state.auth);
 
   const isRegister = mode === "register";
   const canSubmit =
     email && password && (!isRegister || isValidPassword(password));
 
-  async function submit(e: React.FormEvent) {
+  function submit(e: React.SubmitEvent) {
     e.preventDefault();
-    setError("");
-    setLoading(true);
-    try {
-      const user = await (isRegister ? api.register : api.login)(
-        email,
-        password
-      );
-      onSuccess(user);
-    } catch (err) {
-      setError((err as Error).message);
-    } finally {
-      setLoading(false);
-    }
+    dispatch((isRegister ? register : login)({ email, password }));
   }
 
   function toggle() {
     setMode(isRegister ? "login" : "register");
-    setError("");
+    dispatch(clearError());
   }
 
   return (
@@ -90,11 +80,7 @@ export function AuthForm({ onSuccess }: { onSuccess: (user: User) => void }) {
             className="w-full"
             disabled={!canSubmit || loading}
           >
-            {loading
-              ? "Please wait…"
-              : isRegister
-                ? "Create account"
-                : "Sign in"}
+            {loading ? <Spinner /> : isRegister ? "Create account" : "Sign in"}
           </Button>
           <p className="text-sm text-muted-foreground">
             {isRegister ? "Already have an account?" : "Don't have an account?"}{" "}
