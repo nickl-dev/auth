@@ -12,7 +12,7 @@ async function request<T>(
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data.error ?? "Something went wrong");
-  return data;
+  return data.user;
 }
 
 export const api = {

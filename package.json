@@ -10,6 +10,8 @@
     "test": "concurrently \"npm run test:client\" \"npm run test:server\"",
     "test:client": "npm run test --workspace=client",
     "test:server": "npm run test --workspace=server",
+    "build:client": "npm run build --workspace=client",
+    "build:server": "npm run build --workspace=server",
     "build": "concurrently \"npm run build:client\" \"npm run build:server\""
   },
   "keywords": [],

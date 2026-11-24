@@ -23,10 +23,15 @@ function App() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-gradient-to-br from-slate-50 via-background to-indigo-50">
+    <div className="flex min-h-screen flex-col bg-linear-to-br from-slate-50 via-background to-indigo-50">
       <Navbar user={user} onLogout={logout} />
       <main className="flex flex-1 items-center justify-center p-4">
-        {ready && (user ? <Authenticated /> : <AuthForm onSuccess={setUser} />)}
+        {ready &&
+          (user ? (
+            <Authenticated />
+          ) : (
+            <AuthForm onSuccess={(user) => setUser(user)} />
+          ))}
       </main>
     </div>
   );

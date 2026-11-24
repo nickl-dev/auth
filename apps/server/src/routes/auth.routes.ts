@@ -29,13 +29,13 @@ router.post("/login", async (req, res) => {
       user: req.session.user,
       sessionId: req.sessionID
     });
-    res.json({ user: req.session.user });
+    res.status(200).json({ user: req.session.user });
   });
 });
 
 router.get("/me", (req, res) => {
   if (req.session.user) {
-    res.json({ user: req.session.user });
+    res.status(200).json({ user: req.session.user });
     console.log({
       route: "/me",
       user: req.session.user,
