@@ -38,7 +38,7 @@ export function AuthForm() {
 
   return (
     <Card className="w-full max-w-sm shadow-xl">
-      <CardHeader>
+      <CardHeader className="text-center">
         <CardTitle className="text-2xl">
           {isRegister ? "Create an account" : "Welcome back"}
         </CardTitle>
@@ -72,7 +72,9 @@ export function AuthForm() {
             />
           </div>
           {isRegister && <PasswordRequirements password={password} />}
-          {error && <p className="text-sm text-destructive">{error}</p>}
+          {error && (
+            <p className="text-sm text-destructive text-center">{error}</p>
+          )}
         </CardContent>
         <CardFooter className="mt-6 flex-col gap-4">
           <Button
