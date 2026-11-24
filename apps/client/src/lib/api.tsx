@@ -2,12 +2,14 @@ export interface User {
   email: string;
 }
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 async function request<T>(
   method: string,
   path: string,
   body?: unknown
 ): Promise<T> {
-  const res = await fetch(`/api/auth/${path}`, {
+  const res = await fetch(`${API_URL}/api/auth/${path}`, {
     method,
     headers: { "Content-Type": "application/json" },
     body: body ? JSON.stringify(body) : undefined
