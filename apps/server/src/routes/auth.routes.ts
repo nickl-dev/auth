@@ -25,9 +25,9 @@ router.post("/login", async (req, res) => {
   const ok = user && (await bcrypt.compare(password, user.passwordHash));
   if (!ok) return res.status(401).json({ error: "Invalid credentials" });
 
-  req.session.regenerate((err) => {
+  req.session.userId = user.id;
+  req.session.save((err) => {
     if (err) return res.status(500).json({ error: "Session error" });
-    req.session.userId = user.id;
     res.status(200).json({ user: toPublicUser(user) });
   });
 });
@@ -46,13 +46,7 @@ router.get("/me", async (req, res) => {
     .from(users)
     .where(eq(users.id, req.session.userId));
 
-  if (!user) {
-    req.session.destroy(() => {
-      res.status(401).json({ error: "Not authorized" });
-    });
-    return;
-  }
-
+  if (!user) return res.status(401).json({ error: "Not authorized" });
   res.status(200).json({ user: toPublicUser(user) });
 });
 
@@ -85,12 +79,10 @@ router.post("/register", async (req, res) => {
         createdAt: users.createdAt
       });
 
-    req.session.regenerate((err) => {
+    req.session.userId = user.id;
+    req.session.save((err) => {
       if (err) return res.status(500).json({ error: "Session error" });
-
-      req.session.userId = user.id;
-
-      res.status(201).json({ user: toPublicUser(user) });
+      res.status(200).json({ user: toPublicUser(user) });
     });
   } catch (error) {
     res.status(500).json({ error: "Server error occured during registration" });
