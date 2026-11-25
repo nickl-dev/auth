@@ -11,6 +11,7 @@ async function request<T>(
 ): Promise<T> {
   const res = await fetch(`${API_URL}/api/auth/${path}`, {
     method,
+    credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: body ? JSON.stringify(body) : undefined
   });

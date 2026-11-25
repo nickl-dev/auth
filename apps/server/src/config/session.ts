@@ -1,13 +1,21 @@
+import { pool } from "../db";
 import session from "express-session";
+import connectPgSimple from "connect-pg-simple";
 
-const isProduction = process.env.NODE_ENV === "production";
+export const isProduction = process.env.NODE_ENV === "production";
 const sessionSecret = process.env.SESSION_SECRET;
+const PgStore = connectPgSimple(session);
 
 if (!sessionSecret || sessionSecret.length < 32) {
   throw new Error("SESSION_SECRET must be at least 32 characters long");
 }
 
 export const sessionMiddleware = session({
+  store: new PgStore({
+    pool,
+    tableName: "user_sessions",
+    createTableIfMissing: true
+  }),
   name: "auth.sid",
   secret: sessionSecret,
   resave: false,

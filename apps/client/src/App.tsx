@@ -1,10 +1,11 @@
 import "./App.css";
 import { Authenticated } from "./components/authenticated";
 import { AuthForm } from "./components/auth-form";
-import { Navbar } from "./components/navbar";
-import { useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "./store/hooks";
+import { AuthSkeleton } from "./components/auth-skeleton";
 import { fetchMe } from "./store/auth-slice";
+import { Navbar } from "./components/navbar";
+import { useAppDispatch, useAppSelector } from "./store/hooks";
+import { useEffect } from "react";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -18,7 +19,7 @@ function App() {
     <div className="flex min-h-screen flex-col bg-linear-to-br from-slate-50 via-background to-indigo-50">
       <Navbar />
       <main className="flex flex-1 items-center justify-center p-4">
-        {ready && (user ? <Authenticated /> : <AuthForm />)}
+        {!ready ? <AuthSkeleton /> : user ? <Authenticated /> : <AuthForm />}
       </main>
     </div>
   );

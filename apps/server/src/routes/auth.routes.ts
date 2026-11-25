@@ -2,6 +2,7 @@ import { db } from "../db";
 import { eq } from "drizzle-orm";
 import { isValidEmail, isValidPassword } from "../utils/validation";
 import { Router } from "express";
+import { toPublicUser } from "../utils/user";
 import { users } from "../db/schema";
 import bcrypt from "bcrypt";
 
@@ -12,25 +13,47 @@ router.post("/login", async (req, res) => {
   if (!email || !password)
     return res.status(401).json({ error: "Email and password are required" });
 
-  const [user] = await db.select().from(users).where(eq(users.email, email));
+  const [user] = await db
+    .select({
+      id: users.id,
+      email: users.email,
+      passwordHash: users.passwordHash,
+      createdAt: users.createdAt
+    })
+    .from(users)
+    .where(eq(users.email, email));
   const ok = user && (await bcrypt.compare(password, user.passwordHash));
   if (!ok) return res.status(401).json({ error: "Invalid credentials" });
 
   req.session.regenerate((err) => {
     if (err) return res.status(500).json({ error: "Session error" });
-
-    req.session.user = {
-      id: user?.id,
-      email: user?.email
-    };
-
-    res.status(200).json({ user: req.session.user });
+    req.session.userId = user.id;
+    res.status(200).json({ user: toPublicUser(user) });
   });
 });
 
-router.get("/me", (req, res) => {
-  if (req.session.user) res.status(200).json({ user: req.session.user });
-  else res.status(401).json({ error: "Not authorized" });
+router.get("/me", async (req, res) => {
+  if (!req.session.userId)
+    return res.status(401).json({ error: "Not authorized" });
+
+  const [user] = await db
+    .select({
+      id: users.id,
+      email: users.email,
+      passwordHash: users.passwordHash,
+      createdAt: users.createdAt
+    })
+    .from(users)
+    .where(eq(users.id, req.session.userId));
+
+  if (!user) {
+    req.session.destroy(() => {
+      res.status(401).json({ error: "Not authorized" });
+    });
+    return;
+  }
+
+  res.status(200).json({ user: toPublicUser(user) });
 });
 
 router.post("/register", async (req, res) => {
@@ -55,17 +78,19 @@ router.post("/register", async (req, res) => {
     const [user] = await db
       .insert(users)
       .values({ email, passwordHash })
-      .returning({ id: users.id, email: users.email });
+      .returning({
+        id: users.id,
+        email: users.email,
+        passwordHash: users.passwordHash,
+        createdAt: users.createdAt
+      });
 
     req.session.regenerate((err) => {
       if (err) return res.status(500).json({ error: "Session error" });
 
-      req.session.user = {
-        id: user?.id,
-        email: user?.email
-      };
+      req.session.userId = user.id;
 
-      res.status(201).json({ user: req.session.user });
+      res.status(201).json({ user: toPublicUser(user) });
     });
   } catch (error) {
     res.status(500).json({ error: "Server error occured during registration" });

@@ -1,8 +1,9 @@
-import express from "express";
-import cors from "cors";
-import routes from "./routes/index";
-import authRoutes from "./routes/auth.routes";
+import { isProduction } from "./config/session";
 import { sessionMiddleware } from "./config/session";
+import authRoutes from "./routes/auth.routes";
+import cors from "cors";
+import express from "express";
+import routes from "./routes/index";
 
 const app = express();
 app.use(
@@ -14,6 +15,7 @@ app.use(
   })
 );
 app.use(express.json());
+app.set("trust proxy", 1);
 app.use(sessionMiddleware);
 app.use("/", routes);
 app.use("/api/auth", authRoutes);
